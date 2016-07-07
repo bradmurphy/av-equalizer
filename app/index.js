@@ -142,7 +142,7 @@ Stage.prototype.update = function() {
 
   array.forEach((threshold, index) => {
 
-    this.bars[index].scale.y = (threshold / 64) <= 0 ? 0.17 : threshold / 64;
+    this.bars[index].scale.y = Math.max(0.17, threshold / 64);
     this.bars[index].rotation.x += 0.002;
 
   });
