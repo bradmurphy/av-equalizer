@@ -23,8 +23,6 @@ const Stage = function() {
   this.camera = new THREE.PerspectiveCamera(this.viewAngle, this.aspect, this.near, this.far);
   this.scene = new THREE.Scene();
 
-  this.renderer.setClearColor( 0xffffff, 0);
-
   this.createAudio();
 
 };
@@ -45,7 +43,7 @@ Stage.prototype.createAudio = function() {
   this.analyser.smoothingTimeConstant = 0.4;
   this.analyser.minDecibels = -90;
   this.analyser.maxDecibels = -10;
-  this.analyser.fftSize = 32;
+  this.analyser.fftSize = 64;
 
   this.sourceNode = this.context.createBufferSource();
   let splitter = this.context.createChannelSplitter();
@@ -109,25 +107,22 @@ Stage.prototype.createScene = function() {
 
   this.renderer.setSize(this.width, this.height);
 
-  let count = 16;
+  let count = 32;
 
   for (let i = 0; i < count; i++) {
 
-    let bars = new THREE.CylinderGeometry(5, 5, 10, 32);
+    let bars = new THREE.CylinderGeometry(2, 2, 10, 32);
 
-    let material = new THREE.MeshBasicMaterial({
-      color: Math.random() * 0xffffff,
-      wireframe: true
-    });
+    let material = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF});
 
     let bar = new THREE.Mesh(bars, material);
 
-    this.scene.add(bar);
     this.bars.push(bar);
+    this.scene.add(bar);
 
     bar.position.set(this.position, 0, 0);
 
-    this.position += 10;
+    this.position += 6;
 
   }
 
@@ -143,11 +138,12 @@ Stage.prototype.update = function() {
   let bufferLength = this.analyser.frequencyBinCount;
   let array = new Uint8Array(bufferLength);
 
-  this.analyser.getByteFrequencyData(array)
+  this.analyser.getByteFrequencyData(array);
 
   array.forEach((threshold, index) => {
 
     this.bars[index].scale.y = threshold / 64;
+    this.bars[index].rotation.x += 0.002;
 
   });
 
