@@ -4,7 +4,7 @@
 const Stage = function() {
 
   // selectors
-  this.audio = 'audio/sublime.mp3';
+  this.audio = 'audio/dubfx.mp3';
   this.equalizer = document.querySelector('#equalizer');
 
   // scene variables
@@ -19,12 +19,6 @@ const Stage = function() {
   this.bars = [];
   this.position = -80;
   this.drop = false;
-
-  this.beatCutOff = 20;
-  this.beatHoldTime = 600;
-  this.beatDecayRate = 0.97;
-  this.beatMin = 30;
-  this.beatTime = 30;
 
   this.renderer = new THREE.WebGLRenderer();
   this.camera = new THREE.PerspectiveCamera(this.viewAngle, this.aspect, this.near, this.far);
@@ -166,21 +160,23 @@ Stage.prototype.update = function() {
   array.forEach((threshold, index) => {
 
     let normLevel = (average / 64) * 1;
+    let beat = normLevel * threshold;
 
-    if(normLevel > this.beatCutOff && normLevel > this.beatMin) {
-      this.beatCutOff = normLevel * 1.1;
-      this.beatTime = 0;
-    } else {
-      this.beatTime < this.beatHoldTime ? this.beatTime++ : this.beatCutOff *= this.beatDecayRate;
-    }
-
-    if(threshold > 237 && !this.drop) {
+    if(beat > 260 && !this.drop) {
       this.addParticles();
       this.drop = true;
     }
 
-    if(this.beatTime >= 299 && this.drop) {
-      console.log('add shader', this.beatTime);
+    if(threshold >= 225 && this.drop) {
+
+      console.log('change');
+
+      let x = Math.random() * 50 - 25;
+      let y = Math.random() * 100 - 50;
+      let z = Math.random() * 300 - 100;
+
+      this.changeCamera(x, y, z);
+
     }
 
     this.bars[index].scale.y = Math.max(0.17, threshold / 64);
@@ -191,6 +187,16 @@ Stage.prototype.update = function() {
     this.particleSystem.rotation.y += 0.01;
     this.particleSystem.rotation.x += 0.02;
   }
+
+};
+
+// change camera position
+Stage.prototype.changeCamera = function(x, y, z) {
+
+  this.camera.position.x = x;
+  this.camera.position.y = y;
+  this.camera.position.z = z;
+  this.camera.lookAt(this.scene.position);
 
 };
 
