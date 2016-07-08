@@ -169,7 +169,7 @@ Stage.prototype.update = function() {
     }
 
     // change camera
-    if(beat >= 270 && this.drop) {
+    if(beat >= 305 && this.drop) {
 
       let x = Math.random() * 50 - 25;
       let y = Math.random() * 100 - 50;
@@ -188,7 +188,7 @@ Stage.prototype.update = function() {
       if(beat >= 120) {
         this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
       }
-      
+
     }
 
     // scale cylinders to threshold
