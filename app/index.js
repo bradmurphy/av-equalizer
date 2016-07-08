@@ -162,14 +162,14 @@ Stage.prototype.update = function() {
     let normLevel = (average / 64) * 1;
     let beat = normLevel * threshold;
 
+    // add particles
     if(beat > 260 && !this.drop) {
       this.addParticles();
       this.drop = true;
     }
 
-    if(threshold >= 225 && this.drop) {
-
-      console.log('change');
+    // change camera
+    if(beat >= 270 && this.drop) {
 
       let x = Math.random() * 50 - 25;
       let y = Math.random() * 100 - 50;
@@ -179,14 +179,22 @@ Stage.prototype.update = function() {
 
     }
 
+    // change colors and rotation
+    if(this.drop) {
+
+      this.particleSystem.rotation.y += Math.random() * 0.0009;
+      this.particleSystem.rotation.x += Math.random() * 0.0002;
+
+      if(beat >= 120) {
+        this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
+      }
+      
+    }
+
+    // scale cylinders to threshold
     this.bars[index].scale.y = Math.max(0.17, threshold / 64);
 
   });
-
-  if(this.drop) {
-    this.particleSystem.rotation.y += 0.01;
-    this.particleSystem.rotation.x += 0.02;
-  }
 
 };
 
