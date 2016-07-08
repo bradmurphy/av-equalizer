@@ -18,6 +18,13 @@ const Stage = function() {
   this.timer = 0;
   this.bars = [];
   this.position = -80;
+  this.drop = false;
+
+  this.beatCutOff = 20;
+  this.beatHoldTime = 600;
+  this.beatDecayRate = 0.97;
+  this.beatMin = 30;
+  this.beatTime = 30;
 
   this.renderer = new THREE.WebGLRenderer();
   this.camera = new THREE.PerspectiveCamera(this.viewAngle, this.aspect, this.near, this.far);
@@ -98,6 +105,21 @@ Stage.prototype._onError = function(err) {
 
 };
 
+// average volume
+Stage.prototype.averageVolume = function(array) {
+
+  var values = 0;
+  var average;
+  var length = array.length;
+
+  array.forEach((value) => values += value);
+
+  average = values / length;
+
+  return average;
+
+};
+
 // generate equalizer
 Stage.prototype.createScene = function() {
 
@@ -122,7 +144,7 @@ Stage.prototype.createScene = function() {
 
     bar.position.set(this.position, 0, 0);
 
-    this.position += 6;
+    this.position += 4.75;
 
   }
 
@@ -139,13 +161,81 @@ Stage.prototype.update = function() {
   let array = new Uint8Array(bufferLength);
 
   this.analyser.getByteFrequencyData(array);
+  let average = this.averageVolume(array);
 
   array.forEach((threshold, index) => {
 
+    let normLevel = (average / 64) * 1;
+
+    if(normLevel > this.beatCutOff && normLevel > this.beatMin) {
+      this.beatCutOff = normLevel * 1.1;
+      this.beatTime = 0;
+    } else {
+      this.beatTime < this.beatHoldTime ? this.beatTime++ : this.beatCutOff *= this.beatDecayRate;
+    }
+
+    if(threshold > 237 && !this.drop) {
+      this.addParticles();
+      this.drop = true;
+    }
+
+    if(this.beatTime >= 299 && this.drop) {
+      console.log('add shader', this.beatTime);
+    }
+
     this.bars[index].scale.y = Math.max(0.17, threshold / 64);
-    this.bars[index].rotation.x += 0.002;
 
   });
+
+  if(this.drop) {
+    this.particleSystem.rotation.y += 0.01;
+    this.particleSystem.rotation.x += 0.02;
+  }
+
+};
+
+// add particles
+Stage.prototype.addParticles = function() {
+
+  this.camera.position.x = 25;
+  this.camera.position.y = 150;
+  this.camera.position.z = 100;
+  this.camera.lookAt(this.scene.position);
+
+  // create the particle variables
+  let count = 1600;
+  let particles = new THREE.Geometry();
+  let textureLoader = new THREE.TextureLoader();
+  let pMaterial = new THREE.PointsMaterial({
+    color: 0x63B8FF,
+    size: 4,
+    map: textureLoader.load('images/dot.png'),
+    transparent: true
+  });
+
+  window.material = pMaterial;
+
+  // create the individual particles
+  for (let i = 0; i < count; i++) {
+
+    // create a particle with random
+    // position values, -250 -> 250
+    let pX = Math.random() * 100 - 50;
+    let pY = Math.random() * 100 - 50;
+    let pZ = Math.random() * 100 - 50;
+    let particle = new THREE.Vector3(pX, pY, pZ);
+
+    // add it to the geometry
+    particles.vertices.push(particle);
+
+  }
+
+  // create the particle system
+  this.particleSystem = new THREE.Points(particles, pMaterial);
+  this.particleSystem.sortParticles = true;
+
+  // add it to the scene
+  this.scene.add(this.particleSystem);
 
 };
 
