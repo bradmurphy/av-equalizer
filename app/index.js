@@ -166,7 +166,7 @@ Stage.prototype.createScene = function() {
   this.scene.add(this.discoCam);
   this.discoCam.position.set(0, 0, 0);
 
-  let discoGeo = new THREE.SphereGeometry(450, 75, 75);
+  let discoGeo = new THREE.DodecahedronGeometry(450, 0);
   let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
 
   this.discoBall = new THREE.Mesh(discoGeo, discoMat);
