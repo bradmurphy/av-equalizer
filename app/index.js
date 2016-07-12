@@ -149,15 +149,13 @@ Stage.prototype.createScene = function() {
   for (let i = 0; i < count; i++) {
 
     let bars = new THREE.CylinderGeometry(2, 2, 10, 32);
-
     let material = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF});
-
     let bar = new THREE.Mesh(bars, material);
 
     this.bars.push(bar);
     this.scene.add(bar);
 
-    bar.position.set(this.position, -120, 2000);
+    bar.position.set(this.position, -100, 2000);
 
     this.position += 4.75;
 
@@ -172,7 +170,7 @@ Stage.prototype.createScene = function() {
   let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
 
   this.discoBall = new THREE.Mesh(discoGeo, discoMat);
-  this.discoBall.position.set(0, 50, 0);
+  this.discoBall.position.set(0, 100, 0);
   this.scene.add(this.discoBall);
 
   this.equalizer.appendChild(this.renderer.domElement);
