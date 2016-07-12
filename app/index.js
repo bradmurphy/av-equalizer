@@ -23,8 +23,17 @@ const Stage = function() {
   this.renderer = new THREE.WebGLRenderer();
   this.camera = new THREE.PerspectiveCamera(this.viewAngle, this.aspect, this.near, this.far);
   this.scene = new THREE.Scene();
+  this.textureLoader = new THREE.TextureLoader()
 
   this.createAudio();
+
+  window.addEventListener('resize', () => {
+
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+  });
 
 };
 
@@ -119,10 +128,20 @@ Stage.prototype.createScene = function() {
 
   this.scene.add(this.camera);
 
-  this.camera.position.z = 200;
+  this.camera.position.z = 2400;
 
   this.renderer.setSize(this.width, this.height);
 
+  // add outer sphere
+  let sphereGeo = new THREE.SphereGeometry(2500, 100, 100);
+  let sphereMat = new THREE.MeshBasicMaterial({map: this.textureLoader.load('./images/background.jpg'),});
+
+  this.sphere = new THREE.Mesh(sphereGeo, sphereMat);
+  this.sphere.material.side = THREE.BackSide;
+
+  this.scene.add(this.sphere);
+
+  // add equalizer bars
   let count = 32;
 
   for (let i = 0; i < count; i++) {
@@ -136,11 +155,23 @@ Stage.prototype.createScene = function() {
     this.bars.push(bar);
     this.scene.add(bar);
 
-    bar.position.set(this.position, 0, 0);
+    bar.position.set(this.position, -120, 2000);
 
     this.position += 4.75;
 
   }
+
+  // add disco ball
+  this.discoCam = new THREE.CubeCamera(1, 100000, 128);
+  this.scene.add(this.discoCam);
+  this.discoCam.position.set(0, 0, 0);
+
+  let discoGeo = new THREE.SphereGeometry(450, 75, 75);
+  let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
+
+  this.discoBall = new THREE.Mesh(discoGeo, discoMat);
+  this.discoBall.position.set(0, 50, 0);
+  this.scene.add(this.discoBall);
 
   this.equalizer.appendChild(this.renderer.domElement);
 
@@ -162,33 +193,19 @@ Stage.prototype.update = function() {
     let normLevel = (average / 64) * 1;
     let beat = normLevel * threshold;
 
-    // add particles
-    if(beat > 260 && !this.drop) {
-      this.addParticles();
-      this.drop = true;
+    this.sphere.rotation.x += 0.00009;
+    this.sphere.rotation.y -= 0.0001;
+    this.discoBall.rotation.x += 0.001;
+    this.discoBall.rotation.y += 0.001;
+
+    // change colors
+    if(beat >= 160) {
+      this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
     }
 
-    // change camera
-    if(beat >= 305 && this.drop) {
-
-      let x = Math.random() * 50 - 25;
-      let y = Math.random() * 100 - 50;
-      let z = Math.random() * 300 - 100;
-
-      this.changeCamera(x, y, z);
-
-    }
-
-    // change colors and rotation
-    if(this.drop) {
-
-      this.particleSystem.rotation.y += Math.random() * 0.0009;
-      this.particleSystem.rotation.x += Math.random() * 0.0002;
-
-      if(beat >= 120) {
-        this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
-      }
-
+    if(beat >= 80) {
+      this.discoBall.scale.y = average / 64;
+      this.discoBall.scale.x = average / 64;
     }
 
     // scale cylinders to threshold
@@ -208,55 +225,11 @@ Stage.prototype.changeCamera = function(x, y, z) {
 
 };
 
-// add particles
-Stage.prototype.addParticles = function() {
-
-  this.camera.position.x = 25;
-  this.camera.position.y = 150;
-  this.camera.position.z = 100;
-  this.camera.lookAt(this.scene.position);
-
-  // create the particle variables
-  let count = 1600;
-  let particles = new THREE.Geometry();
-  let textureLoader = new THREE.TextureLoader();
-  let pMaterial = new THREE.PointsMaterial({
-    color: 0x63B8FF,
-    size: 4,
-    map: textureLoader.load('images/dot.png'),
-    transparent: true
-  });
-
-  window.material = pMaterial;
-
-  // create the individual particles
-  for (let i = 0; i < count; i++) {
-
-    // create a particle with random
-    // position values, -250 -> 250
-    let pX = Math.random() * 100 - 50;
-    let pY = Math.random() * 100 - 50;
-    let pZ = Math.random() * 100 - 50;
-    let particle = new THREE.Vector3(pX, pY, pZ);
-
-    // add it to the geometry
-    particles.vertices.push(particle);
-
-  }
-
-  // create the particle system
-  this.particleSystem = new THREE.Points(particles, pMaterial);
-  this.particleSystem.sortParticles = true;
-
-  // add it to the scene
-  this.scene.add(this.particleSystem);
-
-};
-
 // draw scene
 Stage.prototype.render = function() {
 
   this.update();
+  this.discoCam.updateCubeMap(this.renderer, this.scene);
   this.renderer.render(this.scene, this.camera);
 
   requestAnimationFrame(this.render.bind(this));
