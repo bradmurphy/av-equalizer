@@ -18,15 +18,17 @@ const Stage = function() {
   this.timer = 0;
   this.bars = [];
   this.position = -80;
-  this.drop = false;
 
+  // camera, renderer and scene set up
   this.renderer = new THREE.WebGLRenderer();
   this.camera = new THREE.PerspectiveCamera(this.viewAngle, this.aspect, this.near, this.far);
   this.scene = new THREE.Scene();
   this.textureLoader = new THREE.TextureLoader()
 
+  // create audio context call
   this.createAudio();
 
+  // resize event listener
   window.addEventListener('resize', () => {
 
     this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -45,7 +47,7 @@ Stage.prototype.init = function() {
 
 };
 
-// create audio
+// create audio context
 Stage.prototype.createAudio = function() {
 
   this.context = new AudioContext();
@@ -101,14 +103,14 @@ Stage.prototype.playSong = function(buffer) {
 
 };
 
-// on error
+// on audio error, display error
 Stage.prototype._onError = function(err) {
 
   console.info('Audio Error: ' + err);
 
 };
 
-// average volume
+// return average volume
 Stage.prototype.averageVolume = function(array) {
 
   var values = 0;
@@ -123,7 +125,7 @@ Stage.prototype.averageVolume = function(array) {
 
 };
 
-// generate equalizer
+// create scene and objects
 Stage.prototype.createScene = function() {
 
   this.scene.add(this.camera);
@@ -179,7 +181,7 @@ Stage.prototype.createScene = function() {
 
 };
 
-// update equalizer based off of audio data
+// update objects based off of beat detection
 Stage.prototype.update = function() {
 
   let bufferLength = this.analyser.frequencyBinCount;
@@ -198,34 +200,25 @@ Stage.prototype.update = function() {
     this.discoBall.rotation.x += 0.001;
     this.discoBall.rotation.y += 0.001;
 
-    // change colors
+    // change bar colors
     if(beat >= 160) {
       this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
     }
 
+    // scale disco ball
     if(beat >= 80) {
       this.discoBall.scale.y = average / 64;
       this.discoBall.scale.x = average / 64;
     }
 
-    // scale cylinders to threshold
+    // scale bars to threshold
     this.bars[index].scale.y = Math.max(0.17, threshold / 64);
 
   });
 
 };
 
-// change camera position
-Stage.prototype.changeCamera = function(x, y, z) {
-
-  this.camera.position.x = x;
-  this.camera.position.y = y;
-  this.camera.position.z = z;
-  this.camera.lookAt(this.scene.position);
-
-};
-
-// draw scene
+// render scene and camera, call update
 Stage.prototype.render = function() {
 
   this.update();
