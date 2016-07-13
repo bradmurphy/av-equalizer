@@ -4,7 +4,7 @@
 const Stage = function() {
 
   // selectors
-  this.audio = 'audio/dubfx.mp3';
+  this.audio = 'audio/three6.mp3';
   this.equalizer = document.querySelector('#equalizer');
 
   // scene variables
@@ -17,7 +17,10 @@ const Stage = function() {
   this.far = 100000;
   this.timer = 0;
   this.bars = [];
-  this.position = -80;
+  this.position = {
+    x: -100,
+    y: -35
+  };
 
   // camera, renderer and scene set up
   this.renderer = new THREE.WebGLRenderer();
@@ -149,15 +152,21 @@ Stage.prototype.createScene = function() {
   for (let i = 0; i < count; i++) {
 
     let bars = new THREE.CylinderGeometry(2, 2, 10, 32);
-    let material = new THREE.MeshBasicMaterial({color: Math.random() * 0xFFFFFF});
+    let material = new THREE.MeshBasicMaterial({
+      color: Math.random() * 0xFFFFFF,
+      opacity: 1,
+      transparent: true
+    });
+
     let bar = new THREE.Mesh(bars, material);
 
     this.bars.push(bar);
     this.scene.add(bar);
 
-    bar.position.set(this.position, -100, 2000);
+    bar.position.set(this.position.x, this.position.y, 2000);
+    bar.rotation.x = 190;
 
-    this.position += 4.75;
+    this.position.y += 4.75;
 
   }
 
@@ -166,11 +175,11 @@ Stage.prototype.createScene = function() {
   this.scene.add(this.discoCam);
   this.discoCam.position.set(0, 0, 0);
 
-  let discoGeo = new THREE.TorusKnotGeometry(250, 100, 100, 16);
+  let discoGeo = new THREE.TorusKnotGeometry(250, 100, 50, 13, 13, 5);
   let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
 
   this.discoBall = new THREE.Mesh(discoGeo, discoMat);
-  this.discoBall.position.set(0, 100, 0);
+  this.discoBall.position.set(100, 100, 0);
   this.scene.add(this.discoBall);
 
   this.equalizer.appendChild(this.renderer.domElement);
@@ -198,9 +207,15 @@ Stage.prototype.update = function() {
     this.discoBall.rotation.x += 0.001;
     this.discoBall.rotation.y += 0.001;
 
-    // change bar colors
-    if(beat >= 160) {
+    //change bar colors
+    if(beat >= 190) {
       this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
+    }
+
+    if(beat > 1) {
+      this.bars[index].material.opacity = 1;
+    } else if(beat <= 0) {
+      this.bars[index].material.opacity = 0;
     }
 
     // scale disco ball
