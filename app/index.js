@@ -136,7 +136,7 @@ Stage.prototype.createScene = function() {
 
   // add outer sphere
   let sphereGeo = new THREE.SphereGeometry(2500, 100, 100);
-  let sphereMat = new THREE.MeshBasicMaterial({map: this.textureLoader.load('./images/background.jpg'),});
+  let sphereMat = new THREE.MeshBasicMaterial({map: this.textureLoader.load('./images/pattern.jpg'),});
 
   this.sphere = new THREE.Mesh(sphereGeo, sphereMat);
   this.sphere.material.side = THREE.BackSide;
@@ -166,7 +166,7 @@ Stage.prototype.createScene = function() {
   this.scene.add(this.discoCam);
   this.discoCam.position.set(0, 0, 0);
 
-  let discoGeo = new THREE.DodecahedronGeometry(450, 0);
+  let discoGeo = new THREE.TorusKnotGeometry(250, 100, 100, 16);
   let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
 
   this.discoBall = new THREE.Mesh(discoGeo, discoMat);
