@@ -4,7 +4,7 @@
 const Stage = function() {
 
   // selectors
-  this.audio = 'audio/three6.mp3';
+  this.audio = 'audio/froggy.mp3';
   this.equalizer = document.querySelector('#equalizer');
 
   // scene variables
@@ -147,9 +147,7 @@ Stage.prototype.createScene = function() {
   this.scene.add(this.sphere);
 
   // add equalizer bars
-  let count = 32;
-
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < 32; i++) {
 
     let bars = new THREE.CylinderGeometry(2, 2, 10, 32);
     let material = new THREE.MeshBasicMaterial({
