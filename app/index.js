@@ -136,7 +136,7 @@ Stage.prototype.createScene = function() {
 
   // add outer sphere
   let sphereGeo = new THREE.SphereGeometry(2500, 100, 100);
-  let sphereMat = new THREE.MeshBasicMaterial({map: this.textureLoader.load('./images/pattern.jpg'),});
+  let sphereMat = new THREE.MeshBasicMaterial({map: this.textureLoader.load('./images/pattern.jpg')});
 
   this.sphere = new THREE.Mesh(sphereGeo, sphereMat);
   this.sphere.material.side = THREE.BackSide;
