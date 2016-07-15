@@ -199,7 +199,7 @@ Stage.prototype.update = function() {
     this.sphere.rotation.x += 0.00009;
     this.sphere.rotation.y -= 0.00001;
 
-    this.discoBall.rotation.x += 0.0001;
+    this.discoBall.rotation.x += 0.001;
     this.discoBall.rotation.y += 0.0001
 
     // animate disco
