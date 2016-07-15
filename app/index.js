@@ -4,8 +4,8 @@
 const Stage = function() {
 
   // selectors
-  this.audio = 'audio/otherside.mp3';
   this.equalizer = document.querySelector('#equalizer');
+  this.songs = document.querySelector('#songs');
 
   // scene variables
   this.width = window.innerWidth;
@@ -66,7 +66,52 @@ Stage.prototype.createAudio = function() {
 
   this.sourceNode.connect(this.context.destination);
 
-  this.init();
+  this.createScene();
+
+  this.songs.addEventListener('change', (e) => {
+
+    console.log(this.songs.value);
+
+    switch(this.songs.value) {
+      case 'dubfx':
+        if(this.songBuffer) {
+          this.songBuffer = null;
+          this.sourceNode.stop(this.context.currentTime);
+          this.sourceNode.disconnect();
+          this.createAudio();
+        }
+        this.loadSong('audio/dubfx.mp3');
+        break;
+      case 'rhcp':
+        if(this.songBuffer) {
+          this.songBuffer = null;
+          this.sourceNode.stop(this.context.currentTime);
+          this.sourceNode.disconnect();
+          this.createAudio();
+        }
+        this.loadSong('audio/otherside.mp3');
+        break;
+      case 'froggy':
+        if(this.songBuffer) {
+          this.songBuffer = null;
+          this.sourceNode.stop(this.context.currentTime);
+          this.sourceNode.disconnect();
+          this.createAudio();
+        }
+        this.loadSong('audio/froggy.mp3');
+        break;
+      case 'three6':
+        if(this.songBuffer) {
+          this.songBuffer = null;
+          this.sourceNode.stop(this.context.currentTime);
+          this.sourceNode.disconnect();
+          this.createAudio();
+        }
+        this.loadSong('audio/three6.mp3');
+        break;
+    }
+
+  });
 
 };
 
