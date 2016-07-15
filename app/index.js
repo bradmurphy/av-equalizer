@@ -25,8 +25,9 @@ const Stage = function() {
   this.scene = new THREE.Scene();
   this.textureLoader = new THREE.TextureLoader()
 
-  // create audio context call
+  // call audio and scene creation
   this.createAudio();
+  this.createScene();
 
   // resize event listener
   window.addEventListener('resize', () => {
@@ -36,14 +37,6 @@ const Stage = function() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
   });
-
-};
-
-// init scene and play song
-Stage.prototype.init = function() {
-
-  this.loadSong(this.audio);
-  this.createScene();
 
 };
 
@@ -66,8 +59,7 @@ Stage.prototype.createAudio = function() {
 
   this.sourceNode.connect(this.context.destination);
 
-  this.createScene();
-
+  // drop down select event listener
   this.songs.addEventListener('change', (e) => {
 
     console.log(this.songs.value);
@@ -75,43 +67,51 @@ Stage.prototype.createAudio = function() {
     switch(this.songs.value) {
       case 'dubfx':
         if(this.songBuffer) {
-          this.songBuffer = null;
-          this.sourceNode.stop(this.context.currentTime);
           this.sourceNode.disconnect();
-          this.createAudio();
+          this.resetScene();
+          this.loadSong('audio/dubfx.mp3');
+        } else {
+          this.loadSong('audio/dubfx.mp3');
         }
-        this.loadSong('audio/dubfx.mp3');
         break;
       case 'rhcp':
         if(this.songBuffer) {
-          this.songBuffer = null;
-          this.sourceNode.stop(this.context.currentTime);
           this.sourceNode.disconnect();
-          this.createAudio();
+          this.resetScene();
+          this.loadSong('audio/otherside.mp3');
+        } else {
+          this.loadSong('audio/otherside.mp3');
         }
-        this.loadSong('audio/otherside.mp3');
         break;
       case 'froggy':
         if(this.songBuffer) {
-          this.songBuffer = null;
-          this.sourceNode.stop(this.context.currentTime);
           this.sourceNode.disconnect();
-          this.createAudio();
+          this.resetScene();
+          this.loadSong('audio/froggy.mp3')
+        } else {
+          this.loadSong('audio/froggy.mp3')
         }
-        this.loadSong('audio/froggy.mp3');
         break;
       case 'three6':
         if(this.songBuffer) {
-          this.songBuffer = null;
-          this.sourceNode.stop(this.context.currentTime);
           this.sourceNode.disconnect();
-          this.createAudio();
+          this.resetScene();
+          this.loadSong('audio/three6.mp3');
+        } else {
+          this.loadSong('audio/three6.mp3');
         }
-        this.loadSong('audio/three6.mp3');
         break;
     }
 
   });
+
+};
+
+// reset scene
+Stage.prototype.resetScene = function() {
+
+  this.scene.children.forEach( (object) => this.scene.remove(object) );
+  this.createAudio();
 
 };
 
