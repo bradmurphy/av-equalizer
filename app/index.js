@@ -4,7 +4,7 @@
 const Stage = function() {
 
   // selectors
-  this.audio = 'audio/froggy.mp3';
+  this.audio = 'audio/otherside.mp3';
   this.equalizer = document.querySelector('#equalizer');
 
   // scene variables
@@ -17,7 +17,7 @@ const Stage = function() {
   this.far = 100000;
   this.timer = 0;
   this.bars = [];
-  this.position = -50;
+  this.position = -80;
 
   // camera, renderer and scene set up
   this.renderer = new THREE.WebGLRenderer();
@@ -197,24 +197,36 @@ Stage.prototype.update = function() {
     let beat = normLevel * threshold;
 
     this.sphere.rotation.x += 0.00009;
-    this.sphere.rotation.y -= 0.0001;
-    this.discoBall.rotation.x += 0.001;
-    this.discoBall.rotation.y += 0.001;
+    this.sphere.rotation.y -= 0.00001;
+
+    this.discoBall.rotation.x += 0.0001;
+    this.discoBall.rotation.y += 0.0001
 
     // animate disco
-    if(beat >= 150) {
+    if(beat >= 250) {
+
       this.discoBall.scale.y = average / 64;
       this.discoBall.scale.x = average / 64;
+
+      this.sphere.rotation.x += 0.009;
+      this.sphere.rotation.y -= 0.001;
+
     }
 
     // animate bars
-    if(beat >= 1 && beat <= 300) {
+    if(beat >= 1 && beat <= 125) {
+
       this.bars[index].material.opacity = 1;
       this.bars[index].scale.y = Math.max(0.17, threshold / 64);
-    } else if(beat >= 100 && beat <= 300) {
+
+    } else if(beat >= 100 && beat <= 125) {
+
       this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
-    } else if(beat <= 0 || beat > 300) {
+
+    } else if(beat <= 0 || beat > 125) {
+
       this.bars[index].material.opacity = 0;
+
     }
 
   });
