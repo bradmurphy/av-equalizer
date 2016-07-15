@@ -17,10 +17,7 @@ const Stage = function() {
   this.far = 100000;
   this.timer = 0;
   this.bars = [];
-  this.position = {
-    x: -100,
-    y: -35
-  };
+  this.position = -50;
 
   // camera, renderer and scene set up
   this.renderer = new THREE.WebGLRenderer();
@@ -161,10 +158,9 @@ Stage.prototype.createScene = function() {
     this.bars.push(bar);
     this.scene.add(bar);
 
-    bar.position.set(this.position.x, this.position.y, 2000);
-    bar.rotation.x = 190;
+    bar.position.set(this.position, -125, 2000);
 
-    this.position.y += 4.75;
+    this.position += 4.75;
 
   }
 
@@ -177,7 +173,7 @@ Stage.prototype.createScene = function() {
   let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
 
   this.discoBall = new THREE.Mesh(discoGeo, discoMat);
-  this.discoBall.position.set(100, 100, 0);
+  this.discoBall.position.set(0, 175, 0);
   this.scene.add(this.discoBall);
 
   this.equalizer.appendChild(this.renderer.domElement);
@@ -205,25 +201,21 @@ Stage.prototype.update = function() {
     this.discoBall.rotation.x += 0.001;
     this.discoBall.rotation.y += 0.001;
 
-    //change bar colors
-    if(beat >= 190) {
-      this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
-    }
-
-    if(beat > 1) {
-      this.bars[index].material.opacity = 1;
-    } else if(beat <= 0) {
-      this.bars[index].material.opacity = 0;
-    }
-
-    // scale disco ball
-    if(beat >= 80) {
+    // animate disco
+    if(beat >= 150) {
       this.discoBall.scale.y = average / 64;
       this.discoBall.scale.x = average / 64;
     }
 
-    // scale bars to threshold
-    this.bars[index].scale.y = Math.max(0.17, threshold / 64);
+    // animate bars
+    if(beat >= 1 && beat <= 300) {
+      this.bars[index].material.opacity = 1;
+      this.bars[index].scale.y = Math.max(0.17, threshold / 64);
+    } else if(beat >= 100 && beat <= 300) {
+      this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
+    } else if(beat <= 0 || beat > 300) {
+      this.bars[index].material.opacity = 0;
+    }
 
   });
 
