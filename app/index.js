@@ -38,18 +38,22 @@ const Stage = function() {
   // select from menu of songs to play, resets scene and disconnects audio context, then loads the song.
   this.songs.addEventListener('change', (e) => {
 
+    if(this.songBuffer) {
+      this.reset();
+    }
+
     switch(this.songs.value) {
       case 'dubfx':
-        this.songBuffer ? this.reset('audio/dubfx.mp3') : this.loadSong('audio/dubfx.mp3');
+        this.loadSong('audio/dubfx.mp3');
         break;
       case 'rhcp':
-        this.songBuffer ? this.reset('audio/otherside.mp3') : this.loadSong('audio/otherside.mp3');
+        this.loadSong('audio/otherside.mp3');
         break;
       case 'froggy':
-        this.songBuffer ? this.reset('audio/froggy.mp3') : this.loadSong('audio/froggy.mp3');
+        this.loadSong('audio/froggy.mp3');
         break;
       case 'three6':
-        this.songBuffer ? this.reset('audio/three6.mp3') : this.loadSong('audio/three6.mp3');
+        this.loadSong('audio/three6.mp3');
         break;
     }
 
@@ -59,8 +63,8 @@ const Stage = function() {
 
 // reset scene
 // Disconnect source, cancel animation frame, remove all objects from scene, remove the container.
-// Set variables to null/reset and then create audio context and scene again, then load the song.
-Stage.prototype.reset = function(song) {
+// Set variables to null/reset and then create audio context and scene again.
+Stage.prototype.reset = function() {
 
   this.sourceNode.disconnect();
 
@@ -84,8 +88,6 @@ Stage.prototype.reset = function(song) {
 
   this.createAudio();
   this.createScene();
-
-  this.loadSong(song);
 
 };
 
