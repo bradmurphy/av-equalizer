@@ -40,40 +40,16 @@ const Stage = function() {
 
     switch(this.songs.value) {
       case 'dubfx':
-        if(this.songBuffer) {
-          this.sourceNode.disconnect();
-          this.reset();
-          this.loadSong('audio/dubfx.mp3');
-        } else {
-          this.loadSong('audio/dubfx.mp3');
-        }
+        this.songBuffer ? this.reset('audio/dubfx.mp3') : this.loadSong('audio/dubfx.mp3');
         break;
       case 'rhcp':
-        if(this.songBuffer) {
-          this.sourceNode.disconnect();
-          this.reset();
-          this.loadSong('audio/otherside.mp3');
-        } else {
-          this.loadSong('audio/otherside.mp3');
-        }
+        this.songBuffer ? this.reset('audio/otherside.mp3') : this.loadSong('audio/otherside.mp3');
         break;
       case 'froggy':
-        if(this.songBuffer) {
-          this.sourceNode.disconnect();
-          this.reset();
-          this.loadSong('audio/froggy.mp3')
-        } else {
-          this.loadSong('audio/froggy.mp3')
-        }
+        this.songBuffer ? this.reset('audio/froggy.mp3') : this.loadSong('audio/froggy.mp3');
         break;
       case 'three6':
-        if(this.songBuffer) {
-          this.sourceNode.disconnect();
-          this.reset();
-          this.loadSong('audio/three6.mp3');
-        } else {
-          this.loadSong('audio/three6.mp3');
-        }
+        this.songBuffer ? this.reset('audio/three6.mp3') : this.loadSong('audio/three6.mp3');
         break;
     }
 
@@ -82,9 +58,11 @@ const Stage = function() {
 };
 
 // reset scene
-// Cancel animation frame, remove all objects from scene, remove the container.
-// Set variables to null/reset and then create audio context and scene again.
-Stage.prototype.reset = function() {
+// Disconnect source, cancel animation frame, remove all objects from scene, remove the container.
+// Set variables to null/reset and then create audio context and scene again, then load the song.
+Stage.prototype.reset = function(song) {
+
+  this.sourceNode.disconnect();
 
   window.cancelAnimationFrame(this.animation);
 
@@ -106,6 +84,8 @@ Stage.prototype.reset = function() {
 
   this.createAudio();
   this.createScene();
+
+  this.loadSong(song);
 
 };
 
