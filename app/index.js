@@ -1,10 +1,11 @@
 'use strict';
 
 // stage constructor
+// intial variables and event listeners
 const Stage = function() {
 
   // selectors
-  this.equalizer = document.querySelector('#equalizer');
+  this.sceneContainer = document.querySelector('#equalizer');
   this.songs = document.querySelector('#songs');
 
   // scene variables
@@ -19,17 +20,12 @@ const Stage = function() {
   this.bars = [];
   this.position = -80;
 
-  // camera, renderer and scene set up
-  this.renderer = new THREE.WebGLRenderer();
-  this.camera = new THREE.PerspectiveCamera(this.viewAngle, this.aspect, this.near, this.far);
-  this.scene = new THREE.Scene();
-  this.textureLoader = new THREE.TextureLoader()
-
-  // call audio and scene creation
+  // create audio context and scene
   this.createAudio();
   this.createScene();
 
   // resize event listener
+  // scales scene based on screen size
   window.addEventListener('resize', () => {
 
     this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -38,9 +34,83 @@ const Stage = function() {
 
   });
 
+  // drop down select event listener
+  // select from menu of songs to play, resets scene and disconnects audio context, then loads the song.
+  this.songs.addEventListener('change', (e) => {
+
+    switch(this.songs.value) {
+      case 'dubfx':
+        if(this.songBuffer) {
+          this.sourceNode.disconnect();
+          this.reset();
+          this.loadSong('audio/dubfx.mp3');
+        } else {
+          this.loadSong('audio/dubfx.mp3');
+        }
+        break;
+      case 'rhcp':
+        if(this.songBuffer) {
+          this.sourceNode.disconnect();
+          this.reset();
+          this.loadSong('audio/otherside.mp3');
+        } else {
+          this.loadSong('audio/otherside.mp3');
+        }
+        break;
+      case 'froggy':
+        if(this.songBuffer) {
+          this.sourceNode.disconnect();
+          this.reset();
+          this.loadSong('audio/froggy.mp3')
+        } else {
+          this.loadSong('audio/froggy.mp3')
+        }
+        break;
+      case 'three6':
+        if(this.songBuffer) {
+          this.sourceNode.disconnect();
+          this.reset();
+          this.loadSong('audio/three6.mp3');
+        } else {
+          this.loadSong('audio/three6.mp3');
+        }
+        break;
+    }
+
+  });
+
+};
+
+// reset scene
+// Cancel animation frame, remove all objects from scene, remove the container.
+// Set variables to null/reset and then create audio context and scene again.
+Stage.prototype.reset = function() {
+
+  window.cancelAnimationFrame(this.animation);
+
+  this.scene.children.forEach((obj) => {
+    this.scene.remove(obj);
+  });
+
+  this.sceneContainer.removeChild(this.sceneContainer.children[0]);
+
+  this.context = null;
+  this.analyzer = null;
+  this.renderer = null;
+  this.camera = null;
+  this.scene = null;
+  this.textureLoader = null;
+
+  this.position = -80;
+  this.bars = [];
+
+  this.createAudio();
+  this.createScene();
+
 };
 
 // create audio context
+// establish audio context and connect the analyser.
 Stage.prototype.createAudio = function() {
 
   this.context = new AudioContext();
@@ -59,63 +129,10 @@ Stage.prototype.createAudio = function() {
 
   this.sourceNode.connect(this.context.destination);
 
-  // drop down select event listener
-  this.songs.addEventListener('change', (e) => {
-
-    console.log(this.songs.value);
-
-    switch(this.songs.value) {
-      case 'dubfx':
-        if(this.songBuffer) {
-          this.sourceNode.disconnect();
-          this.resetScene();
-          this.loadSong('audio/dubfx.mp3');
-        } else {
-          this.loadSong('audio/dubfx.mp3');
-        }
-        break;
-      case 'rhcp':
-        if(this.songBuffer) {
-          this.sourceNode.disconnect();
-          this.resetScene();
-          this.loadSong('audio/otherside.mp3');
-        } else {
-          this.loadSong('audio/otherside.mp3');
-        }
-        break;
-      case 'froggy':
-        if(this.songBuffer) {
-          this.sourceNode.disconnect();
-          this.resetScene();
-          this.loadSong('audio/froggy.mp3')
-        } else {
-          this.loadSong('audio/froggy.mp3')
-        }
-        break;
-      case 'three6':
-        if(this.songBuffer) {
-          this.sourceNode.disconnect();
-          this.resetScene();
-          this.loadSong('audio/three6.mp3');
-        } else {
-          this.loadSong('audio/three6.mp3');
-        }
-        break;
-    }
-
-  });
-
-};
-
-// reset scene
-Stage.prototype.resetScene = function() {
-
-  this.scene.children.forEach( (object) => this.scene.remove(object) );
-  this.createAudio();
-
 };
 
 // load song
+// request the song, load and establish buffer.
 Stage.prototype.loadSong = function(song) {
 
   let request = new XMLHttpRequest();
@@ -140,6 +157,7 @@ Stage.prototype.loadSong = function(song) {
 };
 
 // play song
+// pull in buffer, set duration and begin playing song.
 Stage.prototype.playSong = function(buffer) {
 
   let duration = buffer.duration;
@@ -155,7 +173,7 @@ Stage.prototype._onError = function(err) {
 
 };
 
-// return average volume
+// return average volume based on array of values
 Stage.prototype.averageVolume = function(array) {
 
   var values = 0;
@@ -173,10 +191,17 @@ Stage.prototype.averageVolume = function(array) {
 // create scene and objects
 Stage.prototype.createScene = function() {
 
-  this.scene.add(this.camera);
+  // camera, renderer and scene set up
+  this.renderer = new THREE.WebGLRenderer();
+  this.camera = new THREE.PerspectiveCamera(this.viewAngle, this.aspect, this.near, this.far);
+  this.scene = new THREE.Scene();
+  this.textureLoader = new THREE.TextureLoader();
 
+  // add camera to scene and set z position
+  this.scene.add(this.camera);
   this.camera.position.z = 2400;
 
+  // set renderer size
   this.renderer.setSize(this.width, this.height);
 
   // add outer sphere
@@ -221,8 +246,9 @@ Stage.prototype.createScene = function() {
   this.discoBall.position.set(0, 175, 0);
   this.scene.add(this.discoBall);
 
-  this.equalizer.appendChild(this.renderer.domElement);
+  this.sceneContainer.appendChild(this.renderer.domElement);
 
+  // call render
   this.render();
 
 };
@@ -284,7 +310,7 @@ Stage.prototype.render = function() {
   this.discoCam.updateCubeMap(this.renderer, this.scene);
   this.renderer.render(this.scene, this.camera);
 
-  requestAnimationFrame(this.render.bind(this));
+  this.animation = requestAnimationFrame(this.render.bind(this));
 
 };
 
