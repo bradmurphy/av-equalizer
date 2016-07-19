@@ -18,7 +18,6 @@ const Stage = function() {
   this.far = 100000;
   this.timer = 0;
   this.bars = [];
-  this.position = -80;
 
   // create audio context and scene
   this.createAudio();
@@ -89,7 +88,6 @@ Stage.prototype.reset = function() {
   this.scene = null;
   this.textureLoader = null;
 
-  this.position = -80;
   this.bars = [];
 
   this.createAudio();
@@ -148,7 +146,7 @@ Stage.prototype.loadSong = function(song) {
 // pull in buffer, set duration and begin playing song.
 Stage.prototype.playSong = function(buffer) {
 
-  let duration = buffer.duration;
+  this.duration = buffer.duration;
   this.sourceNode.buffer = buffer;
   this.sourceNode.start(0);
 
@@ -206,7 +204,7 @@ Stage.prototype.createScene = function() {
 
     let bars = new THREE.CylinderGeometry(2, 2, 10, 32);
     let material = new THREE.MeshBasicMaterial({
-      color: Math.random() * 0xFFFFFF,
+      color: 0xFFFFFF,
       opacity: 1,
       transparent: true
     });
@@ -216,9 +214,10 @@ Stage.prototype.createScene = function() {
     this.bars.push(bar);
     this.scene.add(bar);
 
-    bar.position.set(this.position, -125, 2000);
+    let random1 = Math.random() * 300 - 150;
+    let random2 = Math.random() * 100 - 50;
 
-    this.position += 4.75;
+    bar.position.set(random1, random2, 2000);
 
   }
 
@@ -227,11 +226,11 @@ Stage.prototype.createScene = function() {
   this.scene.add(this.discoCam);
   this.discoCam.position.set(0, 0, 0);
 
-  let discoGeo = new THREE.TorusKnotGeometry(250, 100, 50, 13, 13, 5);
+  let discoGeo = new THREE.TorusKnotGeometry(30, 15, 40, 13, 13, 5);
   let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
 
   this.discoBall = new THREE.Mesh(discoGeo, discoMat);
-  this.discoBall.position.set(0, 175, 0);
+  this.discoBall.position.set(0, 0, 2000);
   this.scene.add(this.discoBall);
 
   this.sceneContainer.appendChild(this.renderer.domElement);
@@ -259,6 +258,17 @@ Stage.prototype.update = function() {
     this.sphere.rotation.y -= 0.00001;
 
     this.discoBall.rotation.x += 0.0009;
+
+    if(beat >= 250) {
+
+      console.log('boom');
+
+      TweenMax.to(this.sphere.rotation, 1, {x: -Math.PI, ease: Power4.easeOut});
+
+      this.bars[index].rotation.x += 0.075;
+      this.bars[index].rotation.y += 0.075;
+
+    }
 
     // animate disco
     if(beat >= 136) {
