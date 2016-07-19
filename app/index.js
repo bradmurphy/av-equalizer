@@ -55,6 +55,12 @@ const Stage = function() {
       case 'three6':
         this.loadSong('audio/three6.mp3');
         break;
+      case 'behappy':
+        this.loadSong('audio/behappy.mp3');
+        break;
+      case 'rainbow':
+        this.loadSong('audio/rainbow.mp3');
+        break;
     }
 
   });
@@ -255,27 +261,23 @@ Stage.prototype.update = function() {
     this.discoBall.rotation.x += 0.0009;
 
     // animate disco
-    if(beat >= 250) {
+    if(beat >= 136) {
 
       this.discoBall.scale.y = average / 64;
       this.discoBall.scale.x = average / 64;
 
-      this.sphere.rotation.x += 0.009;
+      this.sphere.rotation.x += 0.001;
       this.sphere.rotation.y -= 0.001;
 
     }
 
     // animate bars
-    if(beat >= 1 && beat <= 125) {
+    if(beat >= 1 && beat <= 135) {
 
       this.bars[index].material.opacity = 1;
       this.bars[index].scale.y = Math.max(0.17, threshold / 64);
 
-    } else if(beat >= 100 && beat <= 125) {
-
-      this.bars[index].material.color.setHex(Math.random() * 0xFFFFFF);
-
-    } else if(beat <= 0 || beat > 125) {
+    } else if(beat <= 0 || beat > 135) {
 
       this.bars[index].material.opacity = 0;
 
