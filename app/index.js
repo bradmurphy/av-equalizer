@@ -250,13 +250,12 @@ Stage.prototype.update = function() {
       let normLevel = (average / 64) * 1;
       let beat = normLevel * threshold;
 
-      if(this.context.currentTime > 65 && beat >= 346 && beat <= 347) {
+      // animate rings and disco
+      if(this.context.currentTime > 45 && beat >= 346 && beat <= 347) {
 
         this.change = true;
 
-      }
-
-      if(beat >= 208  && beat <= 210 && this.change) {
+      } else if(beat >= 208  && beat <= 210 && this.change) {
 
         TweenMax.to(this.sphere.rotation, 1.5, {x: 360, ease: Power4.easeOut});
         TweenMax.to(this.ring.rotation, 1.5, {x: 360, ease: Power4.easeOut});
@@ -266,10 +265,7 @@ Stage.prototype.update = function() {
         this.ring.rotation.x = 0;
         this.sphere.rotation.x = 0;
 
-      }
-
-      // animate disco scale and sphere rotation
-      if(beat >= 136) {
+      } else if(beat >= 136) {
 
         this.discoBall.scale.y = average / 64;
         this.discoBall.scale.x = average / 64;
@@ -279,10 +275,7 @@ Stage.prototype.update = function() {
 
         this.discoBall.rotation.x += 0.001;
 
-      }
-
-      // animate disco vertices
-      if(beat >= 1 && beat <= 135) {
+      }else if(beat >= 1 && beat <= 135) {
 
         this.ring.scale.y = average / 32;
         this.ring.scale.x = average / 32;
