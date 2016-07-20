@@ -215,7 +215,10 @@ Stage.prototype.createScene = function() {
 
   // add ring
   let ringGeo = new THREE.RingGeometry(85, 90, 20, 1, 8);
-  let ringMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
+  let ringMat = new THREE.MeshBasicMaterial({
+    envMap: this.discoCam.renderTarget.texture,
+    side: THREE.DoubleSide
+  });
 
   this.ring = new THREE.Mesh(ringGeo, ringMat);
   this.ring.position.set(0, 0, 1999);
@@ -269,6 +272,8 @@ Stage.prototype.update = function() {
 
       this.ring.scale.y = average / 32;
       this.ring.scale.x = average / 32;
+
+      this.ring.rotation.y += 0.001
 
     }
 
