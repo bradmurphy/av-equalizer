@@ -257,8 +257,25 @@ Stage.prototype.update = function() {
 
       } else if(beat >= 208  && beat <= 210 && this.change) {
 
-        TweenMax.to(this.sphere.rotation, 1.5, {x: 360, ease: Power4.easeOut});
-        TweenMax.to(this.ring.rotation, 1.5, {x: 360, ease: Power4.easeOut});
+        let random = Math.random() * 300 - 150;
+
+        TweenMax.to(this.ring.rotation, 1, {x: 180, ease: Power4.easeOut});
+
+        TweenMax.to(this.camera.position, 2, {
+          x: random,
+          y: 0,
+          z: 2400,
+          delay: 1,
+          ease: Power4.easeOut
+        });
+
+        TweenMax.to(this.camera.lookAt, 2, {
+          x: this.discoBall.position.x,
+          y: this.discoBall.position.y,
+          z: this.discoBall.position.z,
+          delay: 4.5,
+          ease: Expo.easeOut
+        });
 
         this.change = false;
 
