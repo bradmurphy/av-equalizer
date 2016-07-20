@@ -18,9 +18,9 @@ const Stage = function() {
   this.far = 100000;
   this.timer = 0;
   this.bars = [];
+  this.change = false;
 
-  // create audio context and scene
-  this.createAudio();
+  // create scene
   this.createScene();
 
   // resize event listener
@@ -37,9 +37,7 @@ const Stage = function() {
   // select from menu of songs to play, resets scene and disconnects audio context, then loads the song.
   this.songs.addEventListener('change', (e) => {
 
-    if(this.songBuffer) {
-      this.reset();
-    }
+    this.reset();
 
     switch(this.songs.value) {
       case 'dubfx':
@@ -71,7 +69,9 @@ const Stage = function() {
 // Set variables to null/reset and then create audio context and scene again.
 Stage.prototype.reset = function() {
 
-  this.sourceNode.disconnect();
+  if(this.context) {
+    this.sourceNode.disconnect();
+  }
 
   window.cancelAnimationFrame(this.animation);
 
@@ -214,7 +214,7 @@ Stage.prototype.createScene = function() {
   this.sceneContainer.appendChild(this.renderer.domElement);
 
   // add ring
-  let ringGeo = new THREE.RingGeometry(85, 90, 20, 1, 8);
+  let ringGeo = new THREE.RingGeometry(90, 100, 20, 1, 8);
   let ringMat = new THREE.MeshBasicMaterial({
     envMap: this.discoCam.renderTarget.texture,
     side: THREE.DoubleSide
@@ -232,52 +232,68 @@ Stage.prototype.createScene = function() {
 // update objects based off of beat detection
 Stage.prototype.update = function() {
 
-  let bufferLength = this.analyser.frequencyBinCount;
-  let array = new Uint8Array(bufferLength);
+  if(this.context) {
 
-  this.analyser.getByteFrequencyData(array);
-  let average = this.averageVolume(array);
+    let bufferLength = this.analyser.frequencyBinCount;
+    let array = new Uint8Array(bufferLength);
 
-  array.forEach((threshold, index) => {
+    this.analyser.getByteFrequencyData(array);
+    let average = this.averageVolume(array);
 
-    let normLevel = (average / 64) * 1;
-    let beat = normLevel * threshold;
+    array.forEach((threshold, index) => {
 
-    this.sphere.rotation.x += 0.00009;
-    this.sphere.rotation.y -= 0.00001;
+      this.sphere.rotation.x += 0.00009;
+      this.sphere.rotation.y -= 0.00001;
 
-    this.discoBall.rotation.x += 0.0009;
+      this.discoBall.rotation.x += 0.0009;
 
-    if(beat >= 200) {
+      let normLevel = (average / 64) * 1;
+      let beat = normLevel * threshold;
 
-      TweenMax.to(this.sphere.rotation, 1, {x: -Math.PI, ease: Power4.easeOut});
+      if(this.context.currentTime > 65 && beat >= 346 && beat <= 347) {
 
-    }
+        this.change = true;
 
-    // animate disco scale and sphere rotation
-    if(beat >= 136) {
+      }
 
-      this.discoBall.scale.y = average / 64;
-      this.discoBall.scale.x = average / 64;
+      if(beat >= 208  && beat <= 210 && this.change) {
 
-      this.sphere.rotation.x += 0.001;
-      this.sphere.rotation.y -= 0.001;
+        TweenMax.to(this.sphere.rotation, 1.5, {x: 360, ease: Power4.easeOut});
+        TweenMax.to(this.ring.rotation, 1.5, {x: 360, ease: Power4.easeOut});
 
-      this.discoBall.rotation.x += 0.001;
+        this.change = false;
 
-    }
+        this.ring.rotation.x = 0;
+        this.sphere.rotation.x = 0;
 
-    // animate disco vertices
-    if(beat >= 1 && beat <= 135) {
+      }
 
-      this.ring.scale.y = average / 32;
-      this.ring.scale.x = average / 32;
+      // animate disco scale and sphere rotation
+      if(beat >= 136) {
 
-      this.ring.rotation.y += 0.001
+        this.discoBall.scale.y = average / 64;
+        this.discoBall.scale.x = average / 64;
 
-    }
+        this.sphere.rotation.x += 0.001;
+        this.sphere.rotation.y -= 0.001;
 
-  });
+        this.discoBall.rotation.x += 0.001;
+
+      }
+
+      // animate disco vertices
+      if(beat >= 1 && beat <= 135) {
+
+        this.ring.scale.y = average / 32;
+        this.ring.scale.x = average / 32;
+
+        this.ring.rotation.y += 0.001
+
+      }
+
+    });
+
+  }
 
 };
 
