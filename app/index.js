@@ -58,6 +58,9 @@ const Stage = function() {
       case 'rainbow':
         this.loadSong('audio/rainbow.mp3');
         break;
+      case 'killbill':
+        this.loadSong('audio/killbill.mp3');
+        break;
     }
 
   });
@@ -204,25 +207,47 @@ Stage.prototype.createScene = function() {
   this.scene.add(this.discoCam);
   this.discoCam.position.set(0, 0, 0);
 
-  let discoGeo = new THREE.TorusKnotGeometry(30, 15, 40, 13, 13, 5);
+  let discoGeo = new THREE.TorusKnotGeometry(20, 15, 37, 13, 13, 5);
   let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
 
   this.discoBall = new THREE.Mesh(discoGeo, discoMat);
-  this.discoBall.position.set(0, 0, 2000);
+  this.discoBall.position.set(-50, -100, 2000);
   this.scene.add(this.discoBall);
 
-  this.sceneContainer.appendChild(this.renderer.domElement);
+  let discoGeo2 = new THREE.TorusKnotGeometry(30, 13, 30, 13, 13, 5);
+  let discoMat2 = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
+
+  this.discoBall2 = new THREE.Mesh(discoGeo2, discoMat2);
+  this.discoBall2.position.set(50, 100, 2000);
+  this.scene.add(this.discoBall2);
 
   // add ring
-  let ringGeo = new THREE.RingGeometry(90, 100, 20, 1, 8);
+  let ringGeo = new THREE.SphereGeometry(70, 60, 32);
   let ringMat = new THREE.MeshBasicMaterial({
-    envMap: this.discoCam.renderTarget.texture,
+    map: this.textureLoader.load('./images/pattern2.jpg'),
     side: THREE.DoubleSide
   });
 
   this.ring = new THREE.Mesh(ringGeo, ringMat);
-  this.ring.position.set(0, 0, 1999);
+  this.ring.position.set(0, 0, 1800);
   this.scene.add(this.ring);
+
+  // add shader glow
+  let glowMat = new THREE.ShaderMaterial({
+    uniforms: {},
+    vertexShader: document.getElementById('vertexShader').textContent,
+    fragmentShader: document.getElementById('fragmentShader').textContent,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    transparent: true
+  });
+
+  let glowGeo = new THREE.SphereGeometry(75, 60, 32);
+  this.glow = new THREE.Mesh(glowGeo, glowMat);
+  this.glow.position.set(0, 0, 1800);
+  this.scene.add(this.glow);
+
+  this.sceneContainer.appendChild(this.renderer.domElement);
 
   // call render
   this.render();
@@ -234,9 +259,7 @@ Stage.prototype.update = function() {
 
   if(this.context) {
 
-    let bufferLength = this.analyser.frequencyBinCount;
-    let array = new Uint8Array(bufferLength);
-
+    let array = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(array);
     let average = this.averageVolume(array);
 
@@ -246,6 +269,7 @@ Stage.prototype.update = function() {
       this.sphere.rotation.y -= 0.00001;
 
       this.discoBall.rotation.x += 0.0009;
+      this.discoBall2.rotation.y += 0.0009;
 
       let normLevel = (average / 64) * 1;
       let beat = normLevel * threshold;
@@ -258,13 +282,17 @@ Stage.prototype.update = function() {
       } else if(beat >= 208  && beat <= 210 && this.change) {
 
         let random = Math.random() * 300 - 150;
+        let randomZ = Math.floor(Math.random() * 2800) + 2400;
 
-        TweenMax.to(this.ring.rotation, 1, {x: 180, ease: Power4.easeOut});
+        TweenMax.to([this.discoBall.position, this.discoBall2.position], 2, {
+          y: Math.floor(Math.random() * -100) + 100,
+          ease: Power4.easeOut
+        })
 
         TweenMax.to(this.camera.position, 2, {
           x: random,
           y: 0,
-          z: 2400,
+          z: randomZ,
           delay: 1,
           ease: Power4.easeOut
         });
@@ -292,12 +320,22 @@ Stage.prototype.update = function() {
 
         this.discoBall.rotation.x += 0.001;
 
-      }else if(beat >= 1 && beat <= 135) {
+      }else if(beat >= 1 && beat <= 67) {
 
         this.ring.scale.y = average / 32;
         this.ring.scale.x = average / 32;
 
-        this.ring.rotation.y += 0.001
+        this.ring.rotation.y += (this.discoBall2.rotation.y - this.ring.rotation.y) * 0.2;
+
+        this.glow.scale.y = this.ring.scale.y;
+        this.glow.scale.x = this.ring.scale.x;
+
+        this.glow.rotation.y += (this.discoBall2.rotation.y - this.glow.rotation.y) * 0.2;
+
+      } else if(beat >= 68 && beat <= 135) {
+
+        this.discoBall2.scale.y = average / 64;
+        this.discoBall2.scale.x = average / 64;
 
       }
 
