@@ -23,6 +23,13 @@ const Stage = function() {
   // create scene
   this.createScene();
 
+  // add stats
+  this.stats = new Stats();
+  this.stats.domElement.style.position = 'absolute';
+	this.stats.domElement.style.right = '0px';
+	this.stats.domElement.style.zIndex = 100;
+	this.sceneContainer.appendChild( this.stats.domElement );
+
   // resize event listener
   // scales scene based on screen size
   window.addEventListener('resize', () => {
@@ -258,6 +265,8 @@ Stage.prototype.createScene = function() {
 Stage.prototype.update = function() {
 
   if(this.context) {
+
+    this.stats.update();
 
     let array = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(array);
