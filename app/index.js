@@ -199,29 +199,7 @@ Stage.prototype.createScene = function() {
 
   this.scene.add(this.sphere);
 
-  // add equalizer bars
-  for (let i = 0; i < 32; i++) {
-
-    let bars = new THREE.CylinderGeometry(2, 2, 10, 32);
-    let material = new THREE.MeshBasicMaterial({
-      color: 0xFFFFFF,
-      opacity: 1,
-      transparent: true
-    });
-
-    let bar = new THREE.Mesh(bars, material);
-
-    this.bars.push(bar);
-    this.scene.add(bar);
-
-    let random1 = Math.random() * 300 - 150;
-    let random2 = Math.random() * 100 - 50;
-
-    bar.position.set(random1, random2, 2000);
-
-  }
-
-  // add disco ball
+  // add disco ball and camera
   this.discoCam = new THREE.CubeCamera(1, 100000, 128);
   this.scene.add(this.discoCam);
   this.discoCam.position.set(0, 0, 0);
@@ -234,6 +212,14 @@ Stage.prototype.createScene = function() {
   this.scene.add(this.discoBall);
 
   this.sceneContainer.appendChild(this.renderer.domElement);
+
+  // add ring
+  let ringGeo = new THREE.RingGeometry(85, 90, 20, 1, 8);
+  let ringMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
+
+  this.ring = new THREE.Mesh(ringGeo, ringMat);
+  this.ring.position.set(0, 0, 1999);
+  this.scene.add(this.ring);
 
   // call render
   this.render();
@@ -259,18 +245,13 @@ Stage.prototype.update = function() {
 
     this.discoBall.rotation.x += 0.0009;
 
-    if(beat >= 250) {
-
-      console.log('boom');
+    if(beat >= 200) {
 
       TweenMax.to(this.sphere.rotation, 1, {x: -Math.PI, ease: Power4.easeOut});
 
-      this.bars[index].rotation.x += 0.075;
-      this.bars[index].rotation.y += 0.075;
-
     }
 
-    // animate disco
+    // animate disco scale and sphere rotation
     if(beat >= 136) {
 
       this.discoBall.scale.y = average / 64;
@@ -279,17 +260,15 @@ Stage.prototype.update = function() {
       this.sphere.rotation.x += 0.001;
       this.sphere.rotation.y -= 0.001;
 
+      this.discoBall.rotation.x += 0.001;
+
     }
 
-    // animate bars
+    // animate disco vertices
     if(beat >= 1 && beat <= 135) {
 
-      this.bars[index].material.opacity = 1;
-      this.bars[index].scale.y = Math.max(0.17, threshold / 64);
-
-    } else if(beat <= 0 || beat > 135) {
-
-      this.bars[index].material.opacity = 0;
+      this.ring.scale.y = average / 32;
+      this.ring.scale.x = average / 32;
 
     }
 
