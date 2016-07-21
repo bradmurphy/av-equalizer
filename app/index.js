@@ -294,14 +294,14 @@ Stage.prototype.update = function() {
         let randomZ = Math.floor(Math.random() * 2600) + 2350;
 
         TweenMax.to(this.fatStar.position, 2, {
-          x: Math.floor(Math.random() * 100) + -100,
-          y: Math.floor(Math.random() * 100) + -100,
+          x: Math.floor(Math.random() * 300) + -300,
+          y: Math.floor(Math.random() * 300) + -300,
           ease: Power4.easeOut
         });
 
         TweenMax.to(this.thinStar.position, 2, {
-          x: Math.floor(Math.random() * 100) + -100,
-          y: Math.floor(Math.random() * 100) + -100,
+          x: Math.floor(Math.random() * 300) + -300,
+          y: Math.floor(Math.random() * 300) + -300,
           ease: Power4.easeOut
         });
 
