@@ -28,7 +28,7 @@ const Stage = function() {
   this.stats.domElement.style.position = 'absolute';
 	this.stats.domElement.style.right = '0px';
 	this.stats.domElement.style.zIndex = 100;
-	this.sceneContainer.appendChild( this.stats.domElement );
+	document.body.appendChild( this.stats.domElement );
 
   // resize event listener
   // scales scene based on screen size
@@ -210,34 +210,34 @@ Stage.prototype.createScene = function() {
   this.scene.add(this.sphere);
 
   // add disco ball and camera
-  this.discoCam = new THREE.CubeCamera(1, 100000, 128);
-  this.scene.add(this.discoCam);
-  this.discoCam.position.set(0, 0, 0);
+  this.reflectCam = new THREE.CubeCamera(1, 100000, 128);
+  this.scene.add(this.reflectCam);
+  this.reflectCam.position.set(0, 0, 0);
 
   let discoGeo = new THREE.TorusKnotGeometry(20, 15, 37, 13, 13, 5);
-  let discoMat = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
+  let discoMat = new THREE.MeshBasicMaterial({envMap: this.reflectCam.renderTarget.texture});
 
-  this.discoBall = new THREE.Mesh(discoGeo, discoMat);
-  this.discoBall.position.set(-50, -100, 2000);
-  this.scene.add(this.discoBall);
+  this.fatStar = new THREE.Mesh(discoGeo, discoMat);
+  this.fatStar.position.set(-50, -100, 2000);
+  this.scene.add(this.fatStar);
 
   let discoGeo2 = new THREE.TorusKnotGeometry(30, 13, 30, 13, 13, 5);
-  let discoMat2 = new THREE.MeshBasicMaterial({envMap: this.discoCam.renderTarget.texture});
+  let discoMat2 = new THREE.MeshBasicMaterial({envMap: this.reflectCam.renderTarget.texture});
 
-  this.discoBall2 = new THREE.Mesh(discoGeo2, discoMat2);
-  this.discoBall2.position.set(50, 100, 2000);
-  this.scene.add(this.discoBall2);
+  this.thinStar = new THREE.Mesh(discoGeo2, discoMat2);
+  this.thinStar.position.set(50, 100, 2000);
+  this.scene.add(this.thinStar);
 
-  // add ring
-  let ringGeo = new THREE.SphereGeometry(70, 60, 32);
-  let ringMat = new THREE.MeshBasicMaterial({
+  // add globe
+  let globeGeo = new THREE.SphereGeometry(70, 60, 32);
+  let globeMat = new THREE.MeshBasicMaterial({
     map: this.textureLoader.load('./images/pattern2.jpg'),
     side: THREE.DoubleSide
   });
 
-  this.ring = new THREE.Mesh(ringGeo, ringMat);
-  this.ring.position.set(0, 0, 1800);
-  this.scene.add(this.ring);
+  this.globe = new THREE.Mesh(globeGeo, globeMat);
+  this.globe.position.set(0, 0, 1800);
+  this.scene.add(this.globe);
 
   // add shader glow
   let glowMat = new THREE.ShaderMaterial({
@@ -277,13 +277,13 @@ Stage.prototype.update = function() {
       this.sphere.rotation.x += 0.00009;
       this.sphere.rotation.y -= 0.00001;
 
-      this.discoBall.rotation.x += 0.0009;
-      this.discoBall2.rotation.y += 0.0009;
+      this.fatStar.rotation.x += 0.0009;
+      this.thinStar.rotation.y += 0.0009;
 
       let normLevel = (average / 64) * 1;
       let beat = normLevel * threshold;
 
-      // animate rings and disco
+      // animate globes and disco
       if(this.context.currentTime > 45 && beat >= 346 && beat <= 347) {
 
         this.change = true;
@@ -291,12 +291,19 @@ Stage.prototype.update = function() {
       } else if(beat >= 208  && beat <= 210 && this.change) {
 
         let random = Math.random() * 300 - 150;
-        let randomZ = Math.floor(Math.random() * 2800) + 2400;
+        let randomZ = Math.floor(Math.random() * 2600) + 2350;
 
-        TweenMax.to([this.discoBall.position, this.discoBall2.position], 2, {
-          y: Math.floor(Math.random() * -100) + 100,
+        TweenMax.to(this.fatStar.position, 2, {
+          x: Math.floor(Math.random() * 100) + -100,
+          y: Math.floor(Math.random() * 100) + -100,
           ease: Power4.easeOut
-        })
+        });
+
+        TweenMax.to(this.thinStar.position, 2, {
+          x: Math.floor(Math.random() * 100) + -100,
+          y: Math.floor(Math.random() * 100) + -100,
+          ease: Power4.easeOut
+        });
 
         TweenMax.to(this.camera.position, 2, {
           x: random,
@@ -307,44 +314,44 @@ Stage.prototype.update = function() {
         });
 
         TweenMax.to(this.camera.lookAt, 2, {
-          x: this.discoBall.position.x,
-          y: this.discoBall.position.y,
-          z: this.discoBall.position.z,
+          x: this.globe.position.x,
+          y: this.globe.position.y,
+          z: this.globe.position.z,
           delay: 4.5,
           ease: Expo.easeOut
         });
 
         this.change = false;
 
-        this.ring.rotation.x = 0;
+        this.globe.rotation.x = 0;
         this.sphere.rotation.x = 0;
 
       } else if(beat >= 136) {
 
-        this.discoBall.scale.y = average / 64;
-        this.discoBall.scale.x = average / 64;
+        this.fatStar.scale.y = average / 64;
+        this.fatStar.scale.x = average / 64;
 
         this.sphere.rotation.x += 0.001;
         this.sphere.rotation.y -= 0.001;
 
-        this.discoBall.rotation.x += 0.001;
+        this.fatStar.rotation.x += 0.001;
 
-      }else if(beat >= 1 && beat <= 67) {
+      } else if(beat >= 1 && beat <= 67) {
 
-        this.ring.scale.y = average / 32;
-        this.ring.scale.x = average / 32;
+        this.globe.scale.y = average / 32;
+        this.globe.scale.x = average / 32;
 
-        this.ring.rotation.y += (this.discoBall2.rotation.y - this.ring.rotation.y) * 0.2;
+        this.globe.rotation.y += (this.thinStar.rotation.y - this.globe.rotation.y) * 0.2;
 
-        this.glow.scale.y = this.ring.scale.y;
-        this.glow.scale.x = this.ring.scale.x;
+        this.glow.scale.y = this.globe.scale.y;
+        this.glow.scale.x = this.globe.scale.x;
 
-        this.glow.rotation.y += (this.discoBall2.rotation.y - this.glow.rotation.y) * 0.2;
+        this.glow.rotation.y += (this.thinStar.rotation.y - this.glow.rotation.y) * 0.2;
 
       } else if(beat >= 68 && beat <= 135) {
 
-        this.discoBall2.scale.y = average / 64;
-        this.discoBall2.scale.x = average / 64;
+        this.thinStar.scale.y = average / 64;
+        this.thinStar.scale.x = average / 64;
 
       }
 
@@ -358,7 +365,7 @@ Stage.prototype.update = function() {
 Stage.prototype.render = function() {
 
   this.update();
-  this.discoCam.updateCubeMap(this.renderer, this.scene);
+  this.reflectCam.updateCubeMap(this.renderer, this.scene);
   this.renderer.render(this.scene, this.camera);
 
   this.animation = requestAnimationFrame(this.render.bind(this));
