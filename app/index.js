@@ -68,6 +68,9 @@ const Stage = function() {
       case 'killbill':
         this.loadSong('audio/killbill.mp3');
         break;
+      case 'feeling':
+        this.loadSong('audio/feeling.mp3');
+        break;
     }
 
   });
