@@ -252,7 +252,7 @@ Stage.prototype.createScene = function() {
     transparent: true
   });
 
-  let glowGeo = new THREE.SphereGeometry(75, 60, 32);
+  let glowGeo = new THREE.SphereGeometry(72, 60, 32);
   this.glow = new THREE.Mesh(glowGeo, glowMat);
   this.glow.position.set(0, 0, 1800);
   this.scene.add(this.glow);
@@ -297,20 +297,20 @@ Stage.prototype.update = function() {
         let randomZ = Math.floor(Math.random() * 2600) + 2350;
 
         TweenMax.to(this.fatStar.position, 2, {
-          x: Math.floor(Math.random() * 300) + -300,
-          y: Math.floor(Math.random() * 300) + -300,
+          x: Math.floor(Math.random() * 500) + -500,
+          y: Math.floor(Math.random() * 500) + -500,
           ease: Power4.easeOut
         });
 
         TweenMax.to(this.thinStar.position, 2, {
-          x: Math.floor(Math.random() * 300) + -300,
-          y: Math.floor(Math.random() * 300) + -300,
+          x: Math.floor(Math.random() * 500) + -500,
+          y: Math.floor(Math.random() * 500) + -300,
           ease: Power4.easeOut
         });
 
         TweenMax.to(this.camera.position, 2, {
           x: random,
-          y: 0,
+          y: random,
           z: randomZ,
           delay: 1,
           ease: Power4.easeOut
@@ -326,9 +326,6 @@ Stage.prototype.update = function() {
 
         this.change = false;
 
-        this.globe.rotation.x = 0;
-        this.sphere.rotation.x = 0;
-
       } else if(beat >= 136) {
 
         this.fatStar.scale.y = average / 64;
@@ -341,15 +338,11 @@ Stage.prototype.update = function() {
 
       } else if(beat >= 1 && beat <= 67) {
 
-        this.globe.scale.y = average / 32;
-        this.globe.scale.x = average / 32;
-
-        this.globe.rotation.y += (this.thinStar.rotation.y - this.globe.rotation.y) * 0.2;
+        this.globe.scale.y = average / 64;
+        this.globe.scale.x = average / 64;
 
         this.glow.scale.y = this.globe.scale.y;
         this.glow.scale.x = this.globe.scale.x;
-
-        this.glow.rotation.y += (this.thinStar.rotation.y - this.glow.rotation.y) * 0.2;
 
       } else if(beat >= 68 && beat <= 135) {
 
